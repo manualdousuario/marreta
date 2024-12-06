@@ -25,7 +25,6 @@ $dotenv->load();
 define('SITE_NAME', isset($_ENV['SITE_NAME']) ? $_ENV['SITE_NAME'] : 'Marreta');
 define('SITE_DESCRIPTION', isset($_ENV['SITE_DESCRIPTION']) ? $_ENV['SITE_DESCRIPTION'] : 'Chapéu de paywall é marreta!');
 define('SITE_URL', isset($_ENV['SITE_URL']) ? $_ENV['SITE_URL'] : 'https://' . $_SERVER['HTTP_HOST']);
-define('MAX_ATTEMPTS', 3);  // Número máximo de tentativas para acessar uma URL
 define('DNS_SERVERS', isset($_ENV['DNS_SERVERS']) ? $_ENV['DNS_SERVERS'] : '1.1.1.1, 8.8.8.8');
 define('CACHE_DIR', __DIR__ . '/cache');
 define('DISABLE_CACHE', isset($_ENV['DISABLE_CACHE']) ? filter_var($_ENV['DISABLE_CACHE'], FILTER_VALIDATE_BOOLEAN) : false);
@@ -42,6 +41,14 @@ if (S3_CACHE_ENABLED) {
     define('S3_FOLDER', $_ENV['S3_FOLDER'] ?? 'cache/');
     define('S3_ACL', $_ENV['S3_ACL'] ?? 'private');
     define('S3_ENDPOINT', $_ENV['S3_ENDPOINT'] ?? null);
+}
+
+/**
+ * Configurações do LogOwl
+ */
+define('LOGOWL_ENABLED', isset($_ENV['LOGOWL_ENABLED']) ? filter_var($_ENV['LOGOWL_ENABLED'], FILTER_VALIDATE_BOOLEAN) : false);
+if (LOGOWL_ENABLED) {
+    define('LOGOWL_TICKET', isset($_ENV['LOGOWL_TICKET']) ? $_ENV['LOGOWL_TICKET'] : null);
 }
 
 /**

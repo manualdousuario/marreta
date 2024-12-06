@@ -83,16 +83,54 @@ class URLAnalyzer
     }
 
     /**
-     * Registra erros no arquivo de log
+     * Registra erros no LogOwl
      * 
      * @param string $url URL que gerou o erro
      * @param string $error Mensagem de erro
      */
-    private function logError($url, $error)
+    private function logError($url, $error = 'GENERIC_ERROR', $message = null)
     {
-        $timestamp = date('Y-m-d H:i:s');
-        $logEntry = "[{$timestamp}] URL: {$url} - Error: {$error}" . PHP_EOL;
-        file_put_contents(__DIR__ . '/../logs/error.log', $logEntry, FILE_APPEND);
+        if (defined('LOGOWL_ENABLED') && LOGOWL_ENABLED) {
+            try {
+                $curl = new Curl();
+                $curl->setOpt(CURLOPT_TIMEOUT, 5);
+                $curl->setOpt(CURLOPT_SSL_VERIFYPEER, false);
+                
+                // Prepara o payload do LogOwl
+                $payload = [
+                    'ticket' => uniqid('marreta_', true),
+                    'message' => $error,
+                    'path' => $url,
+                    'type' => 'exception',
+                ];
+
+                if($message) {
+                    $logs = [
+                        'logs' => [
+                            [
+                                'type' => 'error',
+                                'log' => $message,
+                                'timestamp' => time()
+                            ]
+                        ]
+                    ];
+                    array_push($payload, $logs);
+                }
+
+                // Adiciona o backtrace para melhor contexto
+                $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+                if (!empty($backtrace)) {
+                    $caller = $backtrace[1] ?? [];
+                    $payload['line'] = $caller['line'] ?? 0;
+                    $payload['file'] = $caller['file'] ?? '';
+                }
+
+                $curl->setHeader('Content-Type', 'application/json');
+                $curl->post('https://api.logowl.io/logging/error', json_encode($payload));
+            } catch (Exception $e) {
+                // Silenciosamente ignora erros na integração com LogOwl
+            }
+        }
     }
 
     /**
@@ -120,7 +158,7 @@ class URLAnalyzer
         $host = preg_replace('/^www\./', '', $host);
 
         if (in_array($host, BLOCKED_DOMAINS)) {
-            $error = 'Este domínio está bloqueado para extração.';
+            $error = 'BLOCKED_DOMAINS';
             $this->logError($cleanUrl, $error);
             throw new Exception($error);
         }
@@ -134,7 +172,7 @@ class URLAnalyzer
                 return $processedContent;
             }
         } catch (Exception $e) {
-            $this->logError($cleanUrl, "Direct fetch error: " . $e->getMessage());
+            $this->logError($cleanUrl, "FETCH_DEFAULT" . $e->getMessage());
         }
 
         // 5. Tenta buscar do Wayback Machine como fallback
@@ -146,7 +184,7 @@ class URLAnalyzer
                 return $processedContent;
             }
         } catch (Exception $e) {
-            $this->logError($cleanUrl, "Wayback Machine error: " . $e->getMessage());
+            $this->logError($cleanUrl, "FETCH_WAYBACK" . $e->getMessage());
         }
 
         throw new Exception("Não foi possível obter o conteúdo da URL");

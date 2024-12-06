@@ -78,7 +78,7 @@ SITE_NAME="Marreta"
 SITE_DESCRIPTION="Paywall hammer!"
 SITE_URL=http://localhost
 DNS_SERVERS=1.1.1.1, 8.8.8.8
-DEBUG=true
+DISABLE_CACHE=true
 ```
 
 4. Run everything:
@@ -88,7 +88,7 @@ docker-compose up -d
 
 Done! It will be running at `http://localhost` 🎉
 
-The `DEBUG` option when `true` will not generate cache!
+The `DISABLE_CACHE` option when `true` will not generate cache!
 
 ## ⚙️ Customization
 
@@ -147,6 +147,15 @@ See what's happening:
 docker-compose logs app
 ```
 
+Error requests related to website queries are integrated with [LogOwl](https://logowl.io/), an error analysis tool with a free monthly quota of 5,000 records.
+
+To enable this, simply set the following in the environment:
+
+```
+LOGOWL_ENABLED=true
+LOGOWL_TICKET=secret_key
+```
+
 ### Clearing the cache
 
 When you need to clear:
@@ -158,6 +167,6 @@ docker-compose exec app rm -rf /app/cache/*
 
 Made with ❤️! If you have questions or suggestions, open an issue and we'll help! 😉
 
-Thanks to the project [https://github.com/burlesco/burlesco](Burlesco) which served as the basis for several rules!
+Thanks to the project [Burlesco](https://github.com/burlesco/burlesco) which served as the basis for several rules!
 
 Public instance at [marreta.pcdomanual.com](https://marreta.pcdomanual.com)!

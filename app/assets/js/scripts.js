@@ -70,4 +70,16 @@ document.addEventListener('DOMContentLoaded', function () {
             localStorage.setItem('theme', newTheme);
         });
     }
+
+    // Form submission - encode URL to preserve protocol slashes
+    const urlForm = document.getElementById('urlForm');
+    if (urlForm) {
+        urlForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const url = urlInput.value.trim();
+            if (url) {
+                window.location.href = '/p/' + encodeURIComponent(url);
+            }
+        });
+    }
 });

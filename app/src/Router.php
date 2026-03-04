@@ -77,7 +77,8 @@ class Router
 
             // Processing route - uses URLProcessor in web mode
             $r->addRoute('GET', '/p/{url:.+}', function($vars) {
-                $processor = new URLProcessor($this->sanitizeUrl($vars['url']), false);
+                $url = urldecode($vars['url']);
+                $processor = new URLProcessor($this->sanitizeUrl($url), false);
                 $processor->process();
             });
             

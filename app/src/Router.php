@@ -74,7 +74,8 @@ class Router
                 
                 if ($processed['valid']) {
                     if ($processed['needsRedirect']) {
-                        header('Location: ' . SITE_URL . '/api/' . $processed['url']);
+                        $redirectUrl = preg_replace('#^https://#', '', $processed['url']);
+                        header('Location: ' . SITE_URL . '/api/' . $redirectUrl);
                         exit;
                     }
                     
@@ -100,7 +101,8 @@ class Router
                 
                 if ($processed['valid']) {
                     if ($processed['needsRedirect']) {
-                        header('Location: ' . SITE_URL . '/p/' . $processed['url']);
+                        $redirectUrl = preg_replace('#^https://#', '', $processed['url']);
+                        header('Location: ' . SITE_URL . '/p/' . $redirectUrl);
                         exit;
                     }
                     
@@ -181,12 +183,6 @@ class Router
             $url = urldecode($url);
         }
         
-        $needsRedirect = false;
-        
-        if ($checkRedirect && ($hasScheme || $rawUrl !== $url)) {
-            $needsRedirect = true;
-        }
-        
         $url = preg_replace('#/+#', '/', $url);
         
         $url = 'https://' . $url;
@@ -196,6 +192,12 @@ class Router
         }
         
         $sanitizedUrl = $this->sanitizeUrl($url);
+        $processedUrl = preg_replace('#^https://#', '', $sanitizedUrl);
+        $needsRedirect = false;
+
+        if ($checkRedirect && ($hasScheme || $rawUrl !== $processedUrl)) {
+            $needsRedirect = true;
+        }
         
         if (!empty($queryString)) {
             $sanitizedUrl .= $queryString;

@@ -104,4 +104,4 @@ Agradecimento ao projeto [Burlesco](https://github.com/burlesco/burlesco) e [Hov
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=manualdousuario/marreta&type=Date)](https://star-history.com/#manualdousuario/marreta&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=manualdousuario/marreta&type=Date)](https://star-history.dera.page/#manualdousuario/marreta&Date)
